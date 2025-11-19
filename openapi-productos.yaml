@@ -1,0 +1,103 @@
+openapi: 3.0.0
+info:
+  title: API REST - Productos
+  version: 1.0.0
+  description: API para gestionar productos (Node.js + Express + MySQL)
+
+servers:
+  - url: http://jquiroz.net:3022
+    description: Servidor local de desarrollo
+
+paths:
+  /products:
+    get:
+      summary: Listar productos
+      tags: [products]
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductOut'
+
+    post:
+      summary: Crear un nuevo producto
+      tags: [products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductIn'
+      responses:
+        '201':
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductOut'
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{productId}:
+    delete:
+      summary: Eliminar un producto por id
+      tags: [products]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Producto eliminado
+        '404':
+          description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ProductIn:
+      type: object
+      required:
+        - name
+        - price
+        - stock
+      properties:
+        name:
+          type: string
+          example: "Laptop"
+        price:
+          type: number
+          format: float
+          example: 19999.99
+        stock:
+          type: integer
+          example: 10
+
+    ProductOut:
+      allOf:
+        - $ref: '#/components/schemas/ProductIn'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: "Mensaje de error"
